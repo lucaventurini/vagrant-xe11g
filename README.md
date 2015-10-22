@@ -1,62 +1,59 @@
 vagrant-xe11g
 =============
 
-Version 1.0.1 - Notes
+Once upon a time, I had to install Oracle XE 11g for a course I was involved in. 
+And I was the teacher, so really no chance to skip it.
+Unfortunately I had only Linux machines around me, and this repo is the result of my efforts to make them work to the goal.
 
-Changed to smaller packer.io based box with VBox 4.3.2 VBGA
-Turned off iptables in site_xe11g.pp script in the OS config section.
-
-
-
-Motivation:
-
-There are times you need an Oracle database, but you don't want to go into all of the effort and cruft of creating one.
-
-This creates an Oracle XE 11g database which is fully functional to use with the HR schema unlocked in about 5 minutes.
-
-It is very lean and mean.  It boots, via the Vagrantfile, with 512mb RAM allocated to the VM and has the bare minimum of files on the Vagrant box.
-It also has 1GB of swap.
-
-Kit Needed:
-
-Oracle 11g XE R2
-
-http://www.oracle.com/technetwork/products/express-edition/overview/index.html
-
-These scripts use:
-
-- oracle-xe-11.2.0-1.0.x86_64.rpm
-
-I added some dba niceties for this box.
-
-- The box now comes with the hostname xe11g.example.com.  I have removed the node information in the site_xe11g.pp file.
-- vagrant user is a member of the dba group.
-- I have added the oracle_env.sh script to the .bashrc for vagrant so you can use sqlplus in the command line
-- Password are "oracle" for system and sys.  You can see those in the response file in the root of the project.
-- Password for root is vagrant (all vagrant boxes).
-- Related to (2) above, I have a really basic shell script that can be used to incorporate your own schemas when you do the vagrant up or run seperately.  It is a nice example that I found and hacked.
-- You can access the database in either of the following ways from your host machine:
-
-  - http://localhost:8080/apex
-  - Via the normal tns listener port of 1521 from your host machine...for tools like JDeveloper or Eclipse.
-
-~~The one area which I needed a little thought on is handling the swap file if you perform a halt.  I don't add the swap file which is created in the site pp to fstab.  If someone wants to help with that...I will welcome that.  Therefore, I would use a vagrant suspend command. Once running...why do you need to reboot now?  Just do a pause.~~
-
-The fstab above has been resolved thanks to a repo that I found installing Oracle XE (great minds think alike)
-
-https://github.com/rjdkolb/vagrant-ubuntu-oracle-xe/blob/master/modules/oracle/manifests/init.pp
-
-I have added the solution to it to the OS2 class in the site_xe11g.pp
-
-Also...oracle (the user and member of group dba), sounds like a movie doesn't it?  The user "oracle" doesn't have a password or a home directory.  Frankly, you don't need one since vagrant is in the dba group.  If you want to add a passowrd go ahead and su to root and run "passwd oracle" and then change the password.  If you want it persistant, then add a stanza to the site puppet file. 
-
-I will be posting some more information on http://vbatik.wordpress.com so stay tuned. 
-
-Enjoy...
-
-/Matt
-
-Twitter: @baldwinonline
+What follows are the instructions to follow my steps, but you're warned: if you can switch to Windows, *do it*. Trust me.
 
 
+##Setup
+By the way, I think you really need a x64 system and at least 4GB RAM. 
+Can't say if it works on other confs, but I guess no.
+I should mention maybe that I tried it on Ubuntu 12.04...
+If some of your specs are different, maybe it's worth reading the [article that shed light on all of this] [1].
 
+Anyway, here we are:
+ 0. Install VirtualBox, vagrant and puppet. 
+ 
+   Check their websites first, but for puppet you can try:
+  ```
+wget https://apt.puppetlabs.com/puppetlabs-release-precise.deb 
+sudo dpkg -i puppetlabs-release-precise.deb  
+sudo apt-get update
+```
+ 1. `cd` somewhere (the location where you want to put everything
+ 2. Clone this project or download it:
+ 
+ `git clone https://github.com/lucaventurini/vagrant-xe11g.git`
+ 3. Copy the installation [file](http://www.oracle.com/technetwork/database/database-technologies/express-edition/overview/index.html) you downloaded from the Oracle website here:
+
+  ```
+  cd vagrant-xe11g 
+  cp somewhere/oracle-xe_11.2.0-2_amd64.deb .
+  ```
+ 4. Cross your fingers (*really important*)
+ 5. `vagrant up`
+
+By the way, the last step will download and set up a VM, so you can have a coffee now.
+
+##Usage
+
+The web interface will be now available at http://localhost:8080/apex/f?p=4950:2:2370103243114289::NO:::
+
+* Password are "oracle" for system and sys. 
+* Password for root is vagrant (all vagrant boxes).
+
+##Credits
+
+For anything else, thanks including, you should really check the [original repo](https://github.com/matthewbaldwin/vagrant-xe11g).
+I just want to keep track of a wasted morning and what saved my day:
+
+* the already mentioned repo
+* this wonderful article: http://tuhrig.de/3-ways-of-installing-oracle-xe-11g-on-ubuntu/
+
+
+That's all!
+
+[1]: http://tuhrig.de/3-ways-of-installing-oracle-xe-11g-on-ubuntu/
